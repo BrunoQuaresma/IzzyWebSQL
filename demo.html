@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<body>
+	
+	<form action="">
+		
+		<label for="task">Task name:</label><br>
+		<input type="text" id="task">
+		<br><br>
+		<input type="submit" value="add" id="btnAddTask">
+		
+		<h3>Tasks list</h3>
+		<ol id="task-list">
+		<!-- news items here -->	
+		</ol>
+		
+	</form>
+
+	<script src="DB.js"></script>
+	<script>
+			
+		function init(){
+			
+			// Create DB			
+			var version = 1.0,
+				name = 'calcInvest',
+				displayName = 'calcInvestDB';
+				
+			var db = new DB(name, version, displayName);
+			
+			// DB Schema			
+			var taskTable = new Table('tasks',[
+				['id', 'INTEGER PRIMARY KEY AUTOINCREMENT'],
+				['name', 'TEXT']
+			]);
+			
+			db.addTable(taskTable);	
+			
+			// Use DB					
+			db.connect();	
+			
+			// Show List			
+			
+			var list = document.getElementById('task-list');
+			
+			showList(list);
+			
+			// Function show list
+			function showList(list){
+				
+				db.getAll('tasks', function(sqlResult){
+				
+					var rows = sqlResult.rows;				
+					
+					for(var i = 0; i < rows.length; i++){
+						addItemList(rows.item(i).name);
+					}
+					
+				});
+			}
+			
+			// Add item list
+			function addItemList(value){
+				
+				var itemList = document.createElement('li'),
+					text = document.createTextNode(value);
+						
+				itemList.appendChild(text);
+				list.appendChild(itemList);
+						
+			}
+			
+			// Add task
+			
+			var btnAdd = document.getElementById('btnAddTask'),
+				inputAdd = document.getElementById('task');
+			
+			btnAdd.onclick = function(){
+				db.insert('tasks', [
+					['name', inputAdd.value]
+				]);
+				addItemList(inputAdd.value);
+				return false;
+			}
+			
+		}
+		
+		init();
+		
+	</script>
+</body>
+</html>
